@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
@@ -66,7 +66,7 @@ describe('CartModal', () => {
     expect(screen.getByText('Test Product')).toBeInTheDocument();
     expect(screen.getByText('$10.00 x 2')).toBeInTheDocument();
     expect(screen.getByText('Total: $20.00')).toBeInTheDocument();
-    expect(screen.getByText('Proceed to Checkout')).toBeInTheDocument();
+    expect(screen.getByText('Pay with credit card')).toBeInTheDocument();
   });
 
   it('dispatches addItemToCart when "add one item" is clicked', async () => {
@@ -86,7 +86,9 @@ describe('CartModal', () => {
     );
 
     const addButton = screen.getByLabelText('add one item');
-    await userEvent.click(addButton);
+    await act(async () => {
+        await userEvent.click(addButton);
+    });
 
     expect(mockDispatch).toHaveBeenCalledWith(addItemToCart(product));
   });
@@ -108,7 +110,9 @@ describe('CartModal', () => {
     );
 
     const removeButton = screen.getByLabelText('remove one item');
-    await userEvent.click(removeButton);
+    await act(async () => {
+        await userEvent.click(removeButton);
+    });
 
     expect(mockDispatch).toHaveBeenCalledWith(removeItemFromCart(product.id));
   });
@@ -130,12 +134,15 @@ describe('CartModal', () => {
     );
 
     const deleteButton = screen.getByLabelText('delete item');
-    await userEvent.click(deleteButton);
+    await act(async () => {
+        await userEvent.click(deleteButton);
+    });
 
     expect(mockDispatch).toHaveBeenCalledWith(updateItemQuantity({ id: product.id, quantity: 0 }));
   });
 
-  it('calls handleClose when "Proceed to Checkout" button is clicked', async () => {
+  it('calls handleCheckout when "Pay with credit card" button is clicked', async () => {
+    const mockHandleCheckout = jest.fn();
     store = mockStore({
       cart: {
         items: [
@@ -148,13 +155,15 @@ describe('CartModal', () => {
 
     render(
       <Provider store={store}>
-        <CartModal open={true} handleClose={mockHandleClose} />
+        <CartModal open={true} handleClose={mockHandleClose} handleCheckout={mockHandleCheckout} />
       </Provider>
     );
 
-    const checkoutButton = screen.getByText('Proceed to Checkout');
-    await userEvent.click(checkoutButton);
+    const checkoutButton = screen.getByText('Pay with credit card');
+    await act(async () => {
+        await userEvent.click(checkoutButton);
+    });
 
-    expect(mockHandleClose).toHaveBeenCalledTimes(1);
+    expect(mockHandleCheckout).toHaveBeenCalledTimes(1);
   });
 });

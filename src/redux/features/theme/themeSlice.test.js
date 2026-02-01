@@ -59,6 +59,17 @@ describe('themeSlice', () => {
       expect(state.mode).toBe('light');
     });
 
+    it("should default to 'light' mode in a non-browser environment", () => {
+        const originalWindow = global.window;
+        delete global.window;
+
+        const { default: themeReducerWithMock } = require('./themeSlice');
+        const state = themeReducerWithMock(undefined, {});
+        expect(state.mode).toBe('light');
+
+        global.window = originalWindow;
+    });
+
     it("should default to 'light' mode if matchMedia is not supported", () => {
         Storage.prototype.getItem = jest.fn(() => null);
         Object.defineProperty(window, 'matchMedia', {
