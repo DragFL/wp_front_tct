@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import ProductCard from './ProductCard';
@@ -73,7 +73,9 @@ describe('ProductCard', () => {
     );
 
     const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
-    await userEvent.click(addToCartButton);
+    await act(async () => {
+      await userEvent.click(addToCartButton);
+    });
 
     expect(mockDispatch).toHaveBeenCalledTimes(1);
     expect(addItemToCart).toHaveBeenCalledWith(mockProduct);

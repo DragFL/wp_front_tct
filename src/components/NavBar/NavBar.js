@@ -11,7 +11,9 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Badge from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
-import CartModal from '../CartModal/CartModal'; // Import CartModal
+import CartModal from '../CartModal/CartModal';
+import PaymentModal from '../PaymentModal/PaymentModal';
+import SummaryModal from '../SummaryModal/SummaryModal';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -25,9 +27,11 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 function NavBar() {
   const dispatch = useDispatch();
   const mode = useSelector((state) => state.theme.mode);
-  const cartItemCount = useSelector((state) => state.cart.totalQuantity); // Get cart item count from Redux
+  const { totalQuantity, totalAmount } = useSelector((state) => state.cart);
 
-  const [cartModalOpen, setCartModalOpen] = useState(false); // State for CartModal visibility
+  const [cartModalOpen, setCartModalOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [summaryModalOpen, setSummaryModalOpen] = useState(false);
 
   const handleThemeToggle = () => {
     dispatch(toggleTheme());
@@ -41,6 +45,32 @@ function NavBar() {
     setCartModalOpen(false);
   };
 
+  const handlePaymentModalOpen = () => {
+    setPaymentModalOpen(true);
+  };
+
+  const handlePaymentModalClose = () => {
+    setPaymentModalOpen(false);
+  };
+
+  const handleSummaryModalOpen = () => {
+    setSummaryModalOpen(true);
+  };
+
+  const handleSummaryModalClose = () => {
+    setSummaryModalOpen(false);
+  };
+
+  const handleCheckout = () => {
+    handleCartModalClose();
+    handlePaymentModalOpen();
+  };
+
+  const handlePaymentSubmit = () => {
+    handlePaymentModalClose();
+    handleSummaryModalOpen();
+  };
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -50,14 +80,16 @@ function NavBar() {
         <IconButton sx={{ ml: 1 }} onClick={handleThemeToggle} color="inherit" aria-label="toggle light/dark mode">
           {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
         </IconButton>
-        <IconButton aria-label="cart" color="inherit" onClick={handleCartModalOpen}> {/* Add onClick handler */}
-          <StyledBadge badgeContent={cartItemCount} color="secondary">
+        <IconButton aria-label="cart" color="inherit" onClick={handleCartModalOpen}>
+          <StyledBadge badgeContent={totalQuantity} color="secondary">
             <ShoppingCartIcon />
           </StyledBadge>
         </IconButton>
         <Button color="inherit">Login</Button>
       </Toolbar>
-      <CartModal open={cartModalOpen} handleClose={handleCartModalClose} /> {/* Render CartModal */}
+      <CartModal open={cartModalOpen} handleClose={handleCartModalClose} handleCheckout={handleCheckout} />
+      <PaymentModal open={paymentModalOpen} handleClose={handlePaymentModalClose} handlePaymentSubmit={handlePaymentSubmit} />
+      <SummaryModal open={summaryModalOpen} handleClose={handleSummaryModalClose} totalAmount={totalAmount} />
     </AppBar>
   );
 }

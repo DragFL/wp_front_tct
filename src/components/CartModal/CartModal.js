@@ -26,7 +26,7 @@ const style = {
   p: 4,
 };
 
-const CartModal = ({ open, handleClose }) => {
+const CartModal = ({ open, handleClose, handleCheckout }) => {
   const dispatch = useDispatch();
   const { items, totalAmount } = useSelector((state) => state.cart);
 
@@ -42,10 +42,6 @@ const CartModal = ({ open, handleClose }) => {
     dispatch(updateItemQuantity({ id, quantity: 0 }));
   };
 
-  const handleCheckout = () => {
-    handleClose(); // Close the cart modal
-    // TODO: Open Credit Card/Delivery Info Modal
-  };
 
   return (
     <Modal
@@ -88,7 +84,7 @@ const CartModal = ({ open, handleClose }) => {
               Total: ${totalAmount.toFixed(2)}
             </Typography>
             <Button variant="contained" sx={{ mt: 2 }} onClick={handleCheckout}>
-              Proceed to Checkout
+              Pay with credit card
             </Button>
           </>
         )}
